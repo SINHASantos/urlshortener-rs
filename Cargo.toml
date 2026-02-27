@@ -1,6 +1,6 @@
 [package]
 name = "urlshortener"
-version = "3.2.1"
+version = "4.0.0"
 edition = "2021"
 authors = ["Victor Polevoy <maintainer@vpolevoy.com>"]
 description = "A very simple url shortener client library"
@@ -14,8 +14,9 @@ documentation = "https://docs.rs/urlshortener"
 url = "2"
 
 [dependencies.reqwest]
-version = "0.12"
-features = ["blocking"]
+version = "0.13"
+default-features = false
+features = ["json", "http2", "stream", "blocking"]
 optional = true
 
 [features]
