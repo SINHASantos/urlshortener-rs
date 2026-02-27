@@ -18,6 +18,7 @@ impl UrlShortener {
     pub fn with_timeout(seconds: u64) -> Result<UrlShortener, reqwest::Error> {
         let client = ClientBuilder::new()
             .timeout(Duration::from_secs(seconds))
+            .tls_backend_rustls()
             .build()?;
 
         Ok(UrlShortener { client })
@@ -85,15 +86,15 @@ impl UrlShortener {
         use_providers: Option<&[providers::Provider]>,
     ) -> Result<String, ProviderError> {
         let providers = use_providers.unwrap_or(providers::PROVIDERS);
+        let mut last_error = None;
         for provider in providers {
-            let res = self.generate(url, provider);
-
-            if res.is_ok() {
-                return res;
+            match self.generate(url, provider) {
+                Ok(short) => return Ok(short),
+                Err(e) => last_error = Some(e),
             }
         }
 
-        Err(ProviderError::Connection)
+        Err(last_error.expect("error is impossible to occur"))
     }
 
     /// Attempts to get a short URL using the specified provider.
@@ -123,13 +124,12 @@ impl UrlShortener {
     ) -> Result<String, ProviderError> {
         let req = request(url.as_ref(), provider);
 
-        if let Ok(response) = req.execute(&self.client) {
-            response
+        match req.execute(&self.client) {
+            Ok(response) => response
                 .text()
-                .map_err(|_| ProviderError::Connection)
-                .and_then(|t| parse(&t, provider))
-        } else {
-            Err(ProviderError::Connection)
+                .map_err(|e| ProviderError::Connection(e))
+                .and_then(|t| parse(&t, provider)),
+            Err(e) => Err(ProviderError::Connection(e)),
         }
     }
 }

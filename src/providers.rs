@@ -9,20 +9,22 @@ const FAKE_USER_AGENT: &str =
     "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0";
 
 /// Describes the provider error.
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
+#[derive(Debug)]
 pub enum ProviderError {
     /// Means there was a connection error. Usually when making a request.
-    Connection,
+    #[cfg(feature = "client")]
+    Connection(reqwest::Error),
     /// Means we were not able to deserialize the answer.
     Deserialize,
 }
 
 impl std::fmt::Display for ProviderError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match *self {
-            Self::Connection => write!(
+        match self {
+            #[cfg(feature = "client")]
+            Self::Connection(e) => write!(
                 f,
-                "A connection problem occured when connecting to a provided."
+                "A connection problem occured when connecting to a provider: {e:#?}",
             ),
             Self::Deserialize => write!(
                 f,
@@ -463,7 +465,7 @@ parse_noop!(vgd_parse);
 request!(
     vgd_req,
     req::Method::Get,
-    "http://v.gd/create.php?format=simple&url={}"
+    "https://v.gd/create.php?format=simple&url={}"
 );
 
 parse_json_tag!(biturl_parse, "short", "");
