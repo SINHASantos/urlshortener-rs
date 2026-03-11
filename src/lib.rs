@@ -7,25 +7,39 @@
 //! Creating a short URL via a specified provider is very simple:
 //!
 //! ```rust,no_run
+//! # #[cfg(not(feature = "client"))]
+//! # fn main() {}
+//! # #[cfg(feature = "client")]
+//! # fn main() {
 //! use urlshortener::{providers::Provider, client::UrlShortener};
 //!
 //! let us = UrlShortener::new().unwrap();
 //! let short_url = us.generate("https://my-long-url.com", &Provider::IsGd);
 //! assert!(short_url.is_ok());
+//! # }
 //! ```
 //!
 //! Or attempting all URL shorteners until one is successfully generated:
 //!
 //! ```rust,no_run
+//! # #[cfg(not(feature = "client"))]
+//! # fn main() {}
+//! # #[cfg(feature = "client")]
+//! # fn main() {
 //! use urlshortener::client::UrlShortener;
 //!
 //! let us = UrlShortener::new().unwrap();
 //! let short_url = us.try_generate("https://my-long-url.com", None);
 //! assert!(short_url.is_ok());
+//! # }
 //! ```
 //! In order to use service with authentication use the appropriate provider directly:
 //!
 //! ```rust,no_run
+//! # #[cfg(not(feature = "client"))]
+//! # fn main() {}
+//! # #[cfg(feature = "client")]
+//! # fn main() {
 //! use urlshortener::{ client::UrlShortener, providers::Provider };
 //!
 //! let us = UrlShortener::new().unwrap();
@@ -33,6 +47,7 @@
 //! let short_url = us.generate("https://my-long-url.com", &Provider::GooGl { api_key:
 //! key.to_owned() });
 //! assert!(short_url.is_ok());
+//! # }
 //! ```
 #![deny(missing_docs)]
 #![deny(warnings)]

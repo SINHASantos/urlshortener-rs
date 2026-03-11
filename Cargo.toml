@@ -1,7 +1,7 @@
 [package]
 name = "urlshortener"
-version = "4.1.0"
-edition = "2021"
+version = "4.2.0"
+edition = "2024"
 authors = ["Victor Polevoy <maintainer@vpolevoy.com>"]
 description = "A very simple url shortener client library"
 readme = "README.md"
@@ -22,3 +22,19 @@ optional = true
 [features]
 default = ["client"]
 client = ["reqwest"]
+
+[[example]]
+name = "via_all_providers"
+required-features = ["client"]
+
+[[example]]
+name = "via_auth_provider"
+required-features = ["client"]
+
+[[example]]
+name = "via_single_provider"
+required-features = ["client"]
+
+[[example]]
+name = "via_kutt_custom_host_provider"
+required-features = ["client"]

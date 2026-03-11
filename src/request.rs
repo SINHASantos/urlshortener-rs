@@ -1,10 +1,12 @@
 #[cfg(feature = "client")]
 use reqwest::{
     blocking::{Client, Response},
-    header::{self, HeaderMap},
+    header::{self, HeaderMap, HeaderName, HeaderValue},
 };
 
+#[cfg(feature = "client")]
 const CONTENT_JSON: &str = "application/json";
+#[cfg(feature = "client")]
 const CONTENT_FORM_URL_ENCODED: &str = "application/x-www-form-urlencoded";
 
 /// An HTTP method abstraction
@@ -40,8 +42,8 @@ pub struct Request {
     pub content_type: Option<ContentType>,
     /// The user agent.
     pub user_agent: Option<UserAgent>,
-    /// Request headers.
-    pub headers: Option<HeaderMap>,
+    /// Request headers as name-value pairs.
+    pub headers: Option<Vec<(String, String)>>,
     /// The HTTP method.
     pub method: Method,
 }
@@ -60,7 +62,16 @@ impl Request {
         }
 
         if let Some(headers) = self.headers.clone() {
-            builder = builder.headers(headers);
+            let mut map = HeaderMap::new();
+            for (name, value) in headers {
+                if let (Ok(n), Ok(v)) = (
+                    HeaderName::from_bytes(name.as_bytes()),
+                    HeaderValue::from_str(&value),
+                ) {
+                    map.insert(n, v);
+                }
+            }
+            builder = builder.headers(map);
         }
 
         if let Some(content_type) = self.content_type {

@@ -127,7 +127,7 @@ impl UrlShortener {
         match req.execute(&self.client) {
             Ok(response) => response
                 .text()
-                .map_err(|e| ProviderError::Connection(e))
+                .map_err(ProviderError::Connection)
                 .and_then(|t| parse(&t, provider)),
             Err(e) => Err(ProviderError::Connection(e)),
         }

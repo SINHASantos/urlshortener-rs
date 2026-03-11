@@ -1,7 +1,6 @@
 //! Library service providers implementation.
 
 use crate::request as req;
-use reqwest::header::HeaderMap;
 use url::form_urlencoded;
 
 /// A user agent for faking weird services.
@@ -365,15 +364,12 @@ request!(
 
 parse_json_tag!(kutt_parse, "shortUrl", "");
 fn kutt_req(url: &str, api_key: &str, host: Option<&str>) -> req::Request {
-    let mut headers = HeaderMap::new();
-    headers.insert("X-API-Key", api_key.parse().unwrap());
-
     req::Request {
         url: format!("{}/api/url/submit", host.unwrap_or("https://kutt.it")),
         body: Some(format!(r#"{{"target": "{}"}}"#, url)),
         content_type: Some(req::ContentType::Json),
         user_agent: None,
-        headers: Some(headers),
+        headers: Some(vec![("X-API-Key".to_owned(), api_key.to_owned())]),
         method: req::Method::Post,
     }
 }
